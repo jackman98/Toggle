@@ -1,50 +1,19 @@
 import QtQuick 2.10
-import QtQuick.Controls 2.2
-import QtQuick.Layouts 1.3
+import QtQuick.Controls 2.3
 
 ApplicationWindow {
     id: mainWindow
     visible: true
     width: 640
     height: 480
-    flags: switcher.enabledToggle ? Qt.FramelessWindowHint : 0
-    title: qsTr("Hello World")
-    property real previousX
-    property real previousY
 
-    Rectangle {
-        height: 20
-        width: parent.width
-        Rectangle {
-            id: exit
-            height: parent.height
-            width: height
-            border.color: "green"
-        }
-        Rectangle {
-            id: exit2
-            height: parent.height
-            width: height
-            border.color: "green"
-        }
-        border.color: "yellow"
-        MouseArea {
-            anchors.fill: parent
-            onPressed: {
-                previousX = mouseX
-                previousY = mouseY
-            }
-            onMouseXChanged: {
-                var dx = mouseX - previousX
-                mainWindow.setX(mainWindow.x + dx)
-                console.log("x: ", mainWindow.x)
-            }
-            onMouseYChanged: {
-                var dy = mouseY - previousY
-                mainWindow.setY(mainWindow.y + dy)
-                console.log("y: ", mainWindow.y)
-            }
-        }
+    flags: switcher.enabledToggle ? Qt.Window | Qt.CustomizeWindowHint : Qt.Window
+    title: qsTr("Toggle")
+
+    CustomWindow {
+        id: window
+        anchors.fill: parent
+        visible: switcher.enabledToggle
     }
 
     Rectangle {
@@ -54,13 +23,18 @@ ApplicationWindow {
         height: width / 2
         color: "#d3cece"
         radius: height / 2
-        Text {
+
+        Label {
             id: stateToggle
             anchors.verticalCenter: background.verticalCenter
             anchors.rightMargin: background.height / 3
             anchors.leftMargin: background.height / 3
-            elide: Text.ElideMiddle
-            font.pointSize: background.height / 3
+            font.pointSize: background.height / 4
+            horizontalAlignment: Qt.AlignHCenter
+            antialiasing: true
+            property real leftTX: (background.height - stateToggle.height) / 2
+            property real rightTX: (background.width - stateToggle.height) - leftTX
+
         }
         Rectangle {
             id: switcher
@@ -71,6 +45,7 @@ ApplicationWindow {
             property bool enabledToggle : false
             property real leftX: (background.height - switcher.height) / 2
             property real rightX: (background.width - switcher.height) - leftX
+
             state: "off"
             color: "#5eb337"
 
@@ -86,14 +61,8 @@ ApplicationWindow {
                     PropertyChanges {
                         target: stateToggle
                         text: "Off"
+                        x: rightTX
                     }
-                    AnchorChanges {
-                        target: stateToggle
-
-                        anchors.left: undefined
-                        anchors.right: background.right
-                    }
-
                 },
                 State {
                     name: "on"
@@ -106,11 +75,7 @@ ApplicationWindow {
                     PropertyChanges {
                         target: stateToggle
                         text: "On"
-                    }
-                    AnchorChanges {
-                        target: stateToggle
-                        anchors.left: background.left
-                        anchors.right: undefined
+                        x: leftTX
                     }
                 }
             ]
@@ -123,10 +88,12 @@ ApplicationWindow {
                     }
 
                     NumberAnimation {
+                        targets: [stateToggle, switcher]
                         property: "x"
                         duration: 300
                         easing.type: Easing.OutQuint
                     }
+
                     AnchorAnimation {
                         duration: 300
                         easing.type: Easing.OutQuint
