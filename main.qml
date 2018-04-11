@@ -3,16 +3,18 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 
 ApplicationWindow {
+    id: mainWindow
     visible: true
     width: 640
     height: 480
     flags: switcher.enabledToggle ? Qt.FramelessWindowHint : 0
     title: qsTr("Hello World")
+    property real previousX
+    property real previousY
 
-    Row {
+    Rectangle {
         height: 20
         width: parent.width
-        spacing: 5
         Rectangle {
             id: exit
             height: parent.height
@@ -24,6 +26,24 @@ ApplicationWindow {
             height: parent.height
             width: height
             border.color: "green"
+        }
+        border.color: "yellow"
+        MouseArea {
+            anchors.fill: parent
+            onPressed: {
+                previousX = mouseX
+                previousY = mouseY
+            }
+            onMouseXChanged: {
+                var dx = mouseX - previousX
+                mainWindow.setX(mainWindow.x + dx)
+                console.log("x: ", mainWindow.x)
+            }
+            onMouseYChanged: {
+                var dy = mouseY - previousY
+                mainWindow.setY(mainWindow.y + dy)
+                console.log("y: ", mainWindow.y)
+            }
         }
     }
 
@@ -107,12 +127,6 @@ ApplicationWindow {
                         duration: 300
                         easing.type: Easing.OutQuint
                     }
-//                    PropertyAnimation {
-//                        target: stateToggle
-//                        property: "opacity"
-//                        from: 1.0
-//                        to: 0.0
-//                    }
                     AnchorAnimation {
                         duration: 300
                         easing.type: Easing.OutQuint
