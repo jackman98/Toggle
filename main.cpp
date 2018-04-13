@@ -1,5 +1,9 @@
 #include <QGuiApplication>
+#include <QQmlContext>
 #include <QQmlApplicationEngine>
+#include <QCursor>
+#include "mouse.h"
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {
@@ -9,6 +13,8 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+	Mouse mouse;
+	engine.rootContext()->setContextProperty("myMouse", &mouse);
     if (engine.rootObjects().isEmpty())
         return -1;
 
